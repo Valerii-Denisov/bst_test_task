@@ -41,6 +41,14 @@ argon2 = ["argon2-cffi (>=19.1.0)"]
 bcrypt = ["bcrypt"]
 
 [[package]]
+name = "et-xmlfile"
+version = "1.1.0"
+description = "An implementation of lxml.xmlfile for the standard library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "flake8"
 version = "6.1.0"
 description = "the modular source code checker: pep8 pyflakes and co"
@@ -60,6 +68,17 @@ description = "McCabe checker, plugin for flake8"
 category = "dev"
 optional = false
 python-versions = ">=3.6"
+
+[[package]]
+name = "openpyxl"
+version = "3.1.2"
+description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+et-xmlfile = "*"
 
 [[package]]
 name = "pycodestyle"
@@ -120,14 +139,16 @@ python-versions = ">=2"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "0789e6fa90ef6b49c6983dd717a8389945bca10199897acea204466aaac4f22f"
+content-hash = "1ff41b5fe44fd092eb336baef7c5314da93c29fc0e2e21a1b6c16d0d11ce8de4"
 
 [metadata.files]
 asgiref = []
 coverage = []
 django = []
+et-xmlfile = []
 flake8 = []
 mccabe = []
+openpyxl = []
 pycodestyle = []
 pyflakes = []
 python-dotenv = []
