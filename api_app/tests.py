@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -8,6 +10,7 @@ import json
 class ApiTestCase(TestCase):
     def setUp(self):
         self.create_robot = reverse('robot_create')
+        self.get_report = reverse('report')
         self.valid_data = {
             'model': 'R2',
             'version': 'D2',
@@ -41,3 +44,10 @@ class ApiTestCase(TestCase):
                 follow=True,
                 content_type="application/json"
             )
+
+    def test_generate_report(self):
+        response = self.client.get(self.get_report)
+        self.assertEquals(
+            response.get('Content-Disposition'),
+            'attachment; filename={date}-factory_report.xlsx'.format(
+                date=datetime.now().strftime('%Y-%m-%d')))
