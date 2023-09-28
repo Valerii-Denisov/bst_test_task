@@ -1,0 +1,7 @@
+[{
+    "model": "customers.customer",
+    "pk": 1,
+    "fields": {
+        "email": "test@test.com"
+    }
+}]
