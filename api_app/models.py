@@ -1,6 +1,7 @@
 from django.db import models
 from orders.models import Order
 
+
 # Create your models here.
 class OrdersQueue(models.Model):
     STATUS_OF_ORDER = [

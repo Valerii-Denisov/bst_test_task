@@ -61,7 +61,7 @@ ROOT_URLCONF = 'R4C.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR+'/templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -140,3 +140,5 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.environ.get('EMAIL_PORT')
 
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures')]
