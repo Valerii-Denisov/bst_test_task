@@ -1,16 +1,17 @@
-from django.shortcuts import render
-from openpyxl.utils import get_column_letter
-
-from robots.models import Robot
-from robots.validator import validate_robot_data
 import json
-import openpyxl
-from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
+import os
 from datetime import datetime, timedelta
+
+import openpyxl
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Font, Alignment, Border, Side, PatternFill
 from django.http import JsonResponse, HttpResponse
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+
+from R4C.settings import BASE_DIR
+from robots.models import Robot
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -18,38 +19,37 @@ class RobotsFactory(View):
 
     def post(self, request):
         data = json.loads(request.body.decode('utf-8'))
-        robot_serial = data.get('serial')
-        robot_model = data.get('model')
-        robot_version = data.get('version')
+        robot_model = str(data.get('model'))
+        robot_version = str(data.get('version'))
+        robot_serial = '{0}-{1}'.format(robot_model, robot_version)
         robot_created = data.get('created')
         robot_data = {
-            'serial': robot_serial,
-            'model': robot_model,
-            'version': robot_version,
+            'serial': robot_serial.lower(),
+            'model': robot_model.lower(),
+            'version': robot_version.lower(),
             'created': robot_created,
         }
-        with open('robots/models_list.json') as json_file:
-            models_list = json.load(json_file)
-        if validate_robot_data(robot_data, models_list.get('robot_models')):
-            robot_item = Robot.objects.create(**robot_data)
-            data = {
-                "message": f"New robot added to "
-                           f"warehouse with id: {robot_item.id}"
-            }
-            return JsonResponse(data, status=201)
-# Create your views here.
+        robot_item = Robot.objects.create(**robot_data)
+        message = 'New robot added to warehouse with id: {0}'.format(
+            robot_item.id,
+        )
+        response_data = {"message": message}
+        return JsonResponse(response_data, status=201)
+
 
 class FactoryReport(View):
     def get(self, request):
-        with open('robots/models_list.json') as json_file:
+        with open(os.path.join(BASE_DIR, 'models_list.json')) as json_file:
             models_list = json.load(json_file)
         response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            content_type='application/vnd.openxmlformats-officedocument.'
+                         'spreadsheetml.sheet',
         )
-        response[
-            'Content-Disposition'] = 'attachment; filename={date}-factory_report.xlsx'.format(
-            date=datetime.now().strftime('%Y-%m-%d'),
+        content_disp = 'attachment; filename={0}-factory_report.xlsx'.format(
+            datetime.now().strftime('%Y-%m-%d'),
         )
+        response['Content-Disposition'] = content_disp
+
         workbook = openpyxl.Workbook()
         workbook.remove(workbook.active)
         header_font = Font(name='Calibri', bold=True)
@@ -60,7 +60,6 @@ class FactoryReport(View):
         wrapped_alignment = Alignment(vertical='top', wrap_text=True)
         columns = [('Model', 35), ('Version', 35), ('Count', 35)]
         for model_index, model in enumerate(models_list.get('robot_models')):
-            # Create a worksheet/tab with the title of the category
             worksheet = workbook.create_sheet(
                 title=model,
                 index=model_index,
@@ -74,17 +73,19 @@ class FactoryReport(View):
                 cell.border = border_bottom
                 cell.alignment = centered_alignment
                 cell.fill = fill
-                # set column width
                 column_letter = get_column_letter(col_num)
                 column_dimensions = worksheet.column_dimensions[column_letter]
                 column_dimensions.width = column_width
             first_date = datetime.now() - timedelta(days=7)
-            robots = Robot.objects.filter(model=model, created__gt=first_date).order_by('created')
+            robots = Robot.objects.filter(
+                model=model,
+                created__gt=first_date,
+            ).order_by('created')
             robot_version = []
             for robot in robots:
                 robot_version.append(robot.version)
             for version in set(robot_version):
-                row_num +=1
+                row_num += 1
                 row = [
                     (model, 'Normal'),
                     (version, 'Normal'),

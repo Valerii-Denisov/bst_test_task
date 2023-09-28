@@ -2,7 +2,7 @@ install:
 	poetry install
 
 lint:
-	poetry run flake8 R4C
+	poetry run flake8 api_app customers orders R4C robots
 
 test:
 	poetry run python manage.py test
