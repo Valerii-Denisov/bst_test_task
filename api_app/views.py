@@ -61,7 +61,7 @@ class FactoryReport(View):
         columns = [('Model', 35), ('Version', 35), ('Count', 35)]
         for model_index, model in enumerate(models_list.get('robot_models')):
             worksheet = workbook.create_sheet(
-                title=model,
+                title=model.upper(),
                 index=model_index,
             )
             fill = PatternFill(fill_type='solid')
@@ -87,8 +87,8 @@ class FactoryReport(View):
             for version in set(robot_version):
                 row_num += 1
                 row = [
-                    (model, 'Normal'),
-                    (version, 'Normal'),
+                    (model.upper(), 'Normal'),
+                    (version.upper(), 'Normal'),
                     (robots.filter(version=version).count(), 'Normal'),
                 ]
                 for col_num, (cell_value, cell_format) in enumerate(row, 1):
