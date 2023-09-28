@@ -1,8 +1,9 @@
-from django.core.exceptions import ValidationError
+import json
+
 from django.test import TestCase
 from django.urls import reverse
 from robots.models import Robot
-import json
+from django.core.exceptions import ValidationError
 
 
 class ApiTestCase(TestCase):
@@ -29,12 +30,12 @@ class ApiTestCase(TestCase):
         self.assertTrue(Robot.objects.get(pk=1))
         self.assertContains(
             request,
-            'New robot added to warehouse with id: 1'.format(self),
+            'New robot added to warehouse with id: 1',
             status_code=201
         )
 
     def test_invalid_robot_create(self):
-        with self.assertRaises(ValidationError) as e:
+        with self.assertRaises(ValidationError):
             request = self.client.post(
                 self.create_robot,
                 json.dumps(self.invalid_data),
