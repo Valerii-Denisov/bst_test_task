@@ -36,17 +36,20 @@ class RobotsFactory(View):
         response_data = {"message": message}
         return JsonResponse(response_data, status=201)
 
+
 class FactoryReport(View):
     def get(self, request):
         with open(os.path.join(BASE_DIR, 'models_list.json')) as json_file:
             models_list = json.load(json_file)
         response = HttpResponse(
-            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            content_type='application/vnd.openxmlformats-officedocument.'
+                         'spreadsheetml.sheet',
         )
-        response[
-            'Content-Disposition'] = 'attachment; filename={date}-factory_report.xlsx'.format(
-            date=datetime.now().strftime('%Y-%m-%d'),
+        content_disp = 'attachment; filename={0}-factory_report.xlsx'.format(
+            datetime.now().strftime('%Y-%m-%d'),
         )
+        response['Content-Disposition'] = content_disp
+
         workbook = openpyxl.Workbook()
         workbook.remove(workbook.active)
         header_font = Font(name='Calibri', bold=True)
@@ -82,7 +85,7 @@ class FactoryReport(View):
             for robot in robots:
                 robot_version.append(robot.version)
             for version in set(robot_version):
-                row_num +=1
+                row_num += 1
                 row = [
                     (model, 'Normal'),
                     (version, 'Normal'),
